@@ -310,7 +310,7 @@ namespace DialogueSystemTools
 
 #if UNITY_EDITOR
     // Custom Inspector for creating EventListener
-    [CustomEditor(typeof(DialogueEventListener))]
+    [CustomEditor(typeof(DialogueEventListener)), CanEditMultipleObjects]
     public class DialogueEventListenerEditor : Editor
     {
         SerializedProperty m_Listener;
