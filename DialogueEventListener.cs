@@ -44,7 +44,7 @@ namespace DialogueSystemTools
         OnStopped // stopped event
     }
 
-    class EventListener : MonoBehaviour
+    class DialogueEventListener : MonoBehaviour
     {
 
         public string conversationGuid = "";
@@ -310,8 +310,8 @@ namespace DialogueSystemTools
 
 #if UNITY_EDITOR
     // Custom Inspector for creating EventListener
-    [CustomEditor(typeof(EventListener))]
-    public class TestInspector : Editor
+    [CustomEditor(typeof(DialogueEventListener))]
+    public class DialogueEventListenerEditor : Editor
     {
         SerializedProperty m_Listener;
         SerializedProperty m_TagMatch;
