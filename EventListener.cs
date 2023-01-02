@@ -9,7 +9,7 @@ using UnityEngine.Playables;
 using UnityEditor;
 #endif
 
-namespace DialogueTools
+namespace DialogueSystemTools
 {
     public enum ListenerMethod
     {
