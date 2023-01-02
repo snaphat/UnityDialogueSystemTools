@@ -394,8 +394,11 @@ namespace DialogueSystemTools
                 {
                     // Update conversation guid if changed (add guid if doesn't exist)
                     var conversation = conversations[i];
-                    if (prev != i) m_conversationGuid.stringValue = AddGuidField(conversation.fields);
-
+                    if (prev != i)
+                    {
+                        m_conversationGuid.stringValue = AddGuidField(conversation.fields);
+                        EditorUtility.SetDirty(DialogueManager.instance.initialDatabase);
+                    }
                     // Grab dialogue entries
                     var texts = conversation.dialogueEntries.ConvertAll(x => new string(x.DialogueText)).ToArray();
 
@@ -415,7 +418,11 @@ namespace DialogueSystemTools
                     {
                         // Update dialogue entry guid if changed (add guid if doesn't exist)
                         var dialogueEntry = conversation.dialogueEntries[j];
-                        if (prev != j) m_dialogueEntryGuid.stringValue = AddGuidField(dialogueEntry.fields);
+                        if (prev != j) 
+                        {
+                            m_dialogueEntryGuid.stringValue = AddGuidField(dialogueEntry.fields);
+                            EditorUtility.SetDirty(DialogueManager.instance.initialDatabase);
+                        }
                     }
                 }
 
