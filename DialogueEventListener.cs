@@ -386,7 +386,7 @@ namespace DialogueSystemTools
                 int j = i != -1 ? FindDialogueEntry(conversations[i], m_dialogueEntryGuid.stringValue) : -1;
 
                 // Draw conversation selector field
-                var titles = conversations.ConvertAll(x => new string(x.Title)).ToArray();
+                var titles = conversations.ConvertAll(x => new string("[" + x.id + "] " + x.Title)).ToArray();
                 i = EditorGUILayout.Popup("Conversation", prev = i, titles);
 
                 // If conversation selected
@@ -400,7 +400,7 @@ namespace DialogueSystemTools
                         EditorUtility.SetDirty(DialogueManager.instance.initialDatabase);
                     }
                     // Grab dialogue entries
-                    var texts = conversation.dialogueEntries.ConvertAll(x => new string(x.DialogueText)).ToArray();
+                    var texts = conversation.dialogueEntries.ConvertAll(x => new string("[" + x.id + "] " + x.DialogueText)).ToArray();
 
                     // Compute style and draw dialogue entry selector for potential multi-line dialogue entry dropdown
                     GUIStyle style = new(EditorStyles.popup);
