@@ -59,13 +59,13 @@ namespace DialogueSystemTools
         public Conversation FindConversation(List<Conversation> conversations, string guid)
         {
             if (guid == null || guid == "") return null;
-            return conversations.Find(x => x.fields.Find(x => x.title == "guid" && x.value == guid) != null);
+            return conversations.Find(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
         }
 
         public DialogueEntry FindDialogueEntry(Conversation conversation, string guid)
         {
             if (guid == null || guid == "" || conversation == null) return null;
-            return conversation.dialogueEntries.Find(x => x.fields.Find(x => x.title == "guid" && x.value == guid) != null);
+            return conversation.dialogueEntries.Find(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
         }
 
         public void Awake()
@@ -331,10 +331,10 @@ namespace DialogueSystemTools
         // Add guid field entry to list (Conversation or DialogueEntry, whichever the list represents)
         public string AddGuidField(List<Field> fields)
         {
-            var field = fields.Find(x => x.title == "guid");
+            var field = fields.Find(x => x.title == "GUID");
             if (field == null)
             {
-                field = new Field("guid", Guid.NewGuid().ToString("N"), FieldType.Text);
+                field = new Field("GUID", Guid.NewGuid().ToString("N"), FieldType.Text);
                 fields.Add(field);
                 return field.value;
             }
@@ -345,7 +345,7 @@ namespace DialogueSystemTools
             }
             else
             {
-                Debug.LogWarning(this.GetType().Name + ": 'guid' field exist on entry but type is not 'FieldType.Text'");
+                Debug.LogWarning(this.GetType().Name + ": 'GUID' field exist on entry but type is not 'FieldType.Text'");
                 return null;
             }
         }
@@ -354,14 +354,14 @@ namespace DialogueSystemTools
         public int FindConversation(List<Conversation> conversations, string guid)
         {
             if (guid == null || guid == "") return -1;
-            return conversations.FindIndex(x => x.fields.Find(x => x.title == "guid" && x.value == guid) != null);
+            return conversations.FindIndex(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
         }
 
         // Find index of dialogue entry with matching guid or return -1
         public int FindDialogueEntry(Conversation conversation, string guid)
         {
             if (guid == null || guid == "" || conversation == null) return -1;
-            return conversation.dialogueEntries.FindIndex(x => x.fields.Find(x => x.title == "guid" && x.value == guid) != null);
+            return conversation.dialogueEntries.FindIndex(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
         }
 
         // Draw inspector GUI
