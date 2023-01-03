@@ -1,0 +1,26 @@
+
+/* Custom USS stylesheet. */
+
+.DialogueMarkerStyle
+{
+    width:18px;
+    height:18px;
+}
+
+/* A marker will use the default style when it is collapsed.*/
+.DialogueMarkerStyle
+{
+    background-image: resource("Icon");
+}
+
+/* A marker will use the hover:focus:checked pseudo-state when it is selected.*/
+.DialogueMarkerStyle:hover:checked
+{
+    background-image: resource("Icon");
+}
+
+/* A marker will use this style when it is not selected and not collapsed.*/
+.DialogueMarkerStyle:checked
+{
+    background-image: resource("Icon");
+}

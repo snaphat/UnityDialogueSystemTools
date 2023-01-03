@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using PixelCrushers.DialogueSystem;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -46,7 +44,6 @@ namespace DialogueSystemTools
 
     class DialogueEventListener : MonoBehaviour
     {
-
         public string conversationGuid = "";
         public string dialogueEntryGuid = "";
 
@@ -56,24 +53,12 @@ namespace DialogueSystemTools
         public ListenerMethod listener; // listener method
         public string tagMatch = "";    // Tag Match check
 
-        public Conversation FindConversation(List<Conversation> conversations, string guid)
-        {
-            if (guid == null || guid == "") return null;
-            return conversations.Find(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
-        }
-
-        public DialogueEntry FindDialogueEntry(Conversation conversation, string guid)
-        {
-            if (guid == null || guid == "" || conversation == null) return null;
-            return conversation.dialogueEntries.Find(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
-        }
-
         public void Awake()
         {
             AddListener();
 
-            conversation = FindConversation(DialogueManager.instance.initialDatabase.conversations, conversationGuid);
-            dialogueEntry = FindDialogueEntry(conversation, dialogueEntryGuid);
+            conversation = Utility.FindConversation(DialogueManager.instance.initialDatabase.conversations, conversationGuid);
+            dialogueEntry = Utility.FindDialogueEntry(conversation, dialogueEntryGuid);
 
             // PlayOnAwake/Play workaround bc played events are trigger before we registered ours if it woke up before
             // us
@@ -328,42 +313,6 @@ namespace DialogueSystemTools
             m_dialogueEntryGuid = serializedObject.FindProperty("dialogueEntryGuid");
         }
 
-        // Add guid field entry to list (Conversation or DialogueEntry, whichever the list represents)
-        public string AddGuidField(List<Field> fields)
-        {
-            var field = fields.Find(x => x.title == "GUID");
-            if (field == null)
-            {
-                field = new Field("GUID", Guid.NewGuid().ToString("N"), FieldType.Text);
-                fields.Add(field);
-                return field.value;
-            }
-            else if (field.type == FieldType.Text)
-            {
-                if (field.value == "") field.value = Guid.NewGuid().ToString("N");
-                return field.value;
-            }
-            else
-            {
-                Debug.LogWarning(this.GetType().Name + ": 'GUID' field exist on entry but type is not 'FieldType.Text'");
-                return null;
-            }
-        }
-
-        // find index of conversation entry with matching guid or return -1
-        public int FindConversation(List<Conversation> conversations, string guid)
-        {
-            if (guid == null || guid == "") return -1;
-            return conversations.FindIndex(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
-        }
-
-        // Find index of dialogue entry with matching guid or return -1
-        public int FindDialogueEntry(Conversation conversation, string guid)
-        {
-            if (guid == null || guid == "" || conversation == null) return -1;
-            return conversation.dialogueEntries.FindIndex(x => x.fields.Find(x => x.title == "GUID" && x.value == guid) != null);
-        }
-
         // Draw inspector GUI
         public override void OnInspectorGUI()
         {
@@ -379,56 +328,11 @@ namespace DialogueSystemTools
                 m_TagMatch.stringValue = EditorGUILayout.TagField("Tag", m_TagMatch.stringValue);
                 if (m_TagMatch.stringValue == "Untagged") m_TagMatch.stringValue = "";
 
-                // Grab conversations
-                var conversations = DialogueManager.instance.initialDatabase.conversations;
-                int prev; // used to check if an update is needed
-                int i = FindConversation(conversations, m_conversationGuid.stringValue);
-                int j = i != -1 ? FindDialogueEntry(conversations[i], m_dialogueEntryGuid.stringValue) : -1;
-
-                // Draw conversation selector field
-                var titles = conversations.ConvertAll(x => new string("[" + x.id + "] " + x.Title)).ToArray();
-                i = EditorGUILayout.Popup("Conversation", prev = i, titles);
-
-                // If conversation selected
-                if (i != -1 && i < conversations.Count)
-                {
-                    // Update conversation guid if changed (add guid if doesn't exist)
-                    var conversation = conversations[i];
-                    if (prev != i)
-                    {
-                        m_conversationGuid.stringValue = AddGuidField(conversation.fields);
-                        EditorUtility.SetDirty(DialogueManager.instance.initialDatabase);
-                    }
-                    // Grab dialogue entries
-                    var texts = conversation.dialogueEntries.ConvertAll(x => new string("[" + x.id + "] " + x.DialogueText)).ToArray();
-
-                    // Compute style and draw dialogue entry selector for potential multi-line dialogue entry dropdown
-                    GUIStyle style = new(EditorStyles.popup);
-                    if (j != -1 && j < conversation.dialogueEntries.Count)
-                        style.fixedHeight = EditorGUIUtility.singleLineHeight * texts[j].Split("\n").Length;
-                    j = EditorGUILayout.Popup("DialogueEntry", prev = j, texts, style);
-
-                    // Fill in space needed for multiple line dialogue
-                    EditorGUILayout.BeginVertical();
-                    GUILayout.Space(style.fixedHeight - EditorGUIUtility.singleLineHeight);
-                    EditorGUILayout.EndVertical();
-
-                    // If dialogue entry selected
-                    if (j != -1 && j < conversation.dialogueEntries.Count)
-                    {
-                        // Update dialogue entry guid if changed (add guid if doesn't exist)
-                        var dialogueEntry = conversation.dialogueEntries[j];
-                        if (prev != j) 
-                        {
-                            m_dialogueEntryGuid.stringValue = AddGuidField(dialogueEntry.fields);
-                            EditorUtility.SetDirty(DialogueManager.instance.initialDatabase);
-                        }
-                    }
-                }
-
                 // apply changes
                 if (changeScope.changed) serializedObject.ApplyModifiedProperties();
             }
+
+            Utility.ConversationSelectorGUI(serializedObject, m_conversationGuid, m_dialogueEntryGuid);
         }
     }
 #endif
