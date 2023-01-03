@@ -133,7 +133,6 @@ namespace DialogueSystemTools
             // Create tooltip
             string tooltip = string.Format("<color=white>Conversation:</color> <color=#ffc108>{0}</color>\n<color=white>Dialogue Entry:</color> <color=#00bdd3>{1}</color>", title, text);
 
-            tooltip = tooltip.Length == 0 ? "No method" : tooltip.TrimEnd();
             return new MarkerDrawOptions { tooltip = tooltip };
         }
     }
