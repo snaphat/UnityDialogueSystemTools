@@ -19,20 +19,17 @@ namespace DialogueSystemTools
     {
         public string conversationGuid = "";
         public string dialogueEntryGuid = "";
-        public Transform conversant;
 
         public Conversation conversation;
         public DialogueEntry dialogueEntry;
 
         public void OnEnable()
         {
-            conversation = Utility.FindConversation(DialogueManager.instance.initialDatabase.conversations, conversationGuid);
-            dialogueEntry = Utility.FindDialogueEntry(conversation, dialogueEntryGuid);
-        }
-
-        public override void OnInitialize(TrackAsset asset)
-        {
-            Debug.Log("init");
+            if (Application.isPlaying)
+            {
+                conversation = Utility.FindConversation(DialogueManager.instance.initialDatabase.conversations, conversationGuid);
+                dialogueEntry = Utility.FindDialogueEntry(conversation, dialogueEntryGuid);
+            }
         }
 
         PropertyName INotification.id { get { return new PropertyName(); } }
@@ -54,7 +51,6 @@ namespace DialogueSystemTools
         {
             // Functional properties
             m_Time = serializedObject.FindProperty("m_Time");
-            m_conversant = serializedObject.FindProperty("conversant");
             m_conversationGuid = serializedObject.FindProperty("conversationGuid");
             m_dialogueEntryGuid = serializedObject.FindProperty("dialogueEntryGuid");
         }
@@ -67,6 +63,7 @@ namespace DialogueSystemTools
             // Make sure there is an instance of all objects before attempting to show anything in inspector
             if (newMarker == null || newMarker.parent == null || TimelineEditor.inspectedDirector == null) return;
 
+            // Warning -- dialogue  event markers should only be used in event marker tracks for correct timeline preview behaviour
             if (newMarker != marker && newMarker && newMarker.parent is not DialogueEventTrack)
                 Debug.LogWarning("<color=red>DialogueSystemTools: Add Dialogue Event Marker to a Dialogue Event Track</color>");
 
@@ -83,9 +80,6 @@ namespace DialogueSystemTools
             if (changeScope.changed) serializedObject.ApplyModifiedProperties();
 
             Utility.ConversationSelectorGUI(serializedObject, m_conversationGuid, m_dialogueEntryGuid);
-            
-            // Warning -- dialogue  event markers should only be used in event marker tracks for correct timeline preview behaviour
-
         }
     }
 
@@ -121,15 +115,23 @@ namespace DialogueSystemTools
         // Sets the marker's tooltip based on its title.
         public override MarkerDrawOptions GetMarkerOptions(IMarker marker)
         {
-            // The `marker argument needs to be cast as the appropriate type, usually the one specified in the `CustomTimelineEditor` attribute
-            var eventMarker = marker as DialogueEventNotification;
-            if (eventMarker == null) return base.GetMarkerOptions(marker);
+            // The marker argument needs to be cast as the appropriate type, usually the one specified in the `CustomTimelineEditor` attribute
+            var notification = marker as DialogueEventNotification;
+            if (notification == null) return base.GetMarkerOptions(marker);
 
             // Set marker icon
-            EditorGUIUtility.SetIconForObject(eventMarker, iconTexture);
+            EditorGUIUtility.SetIconForObject(notification, iconTexture);
+
+            // Lookup conversation and dialogue entry
+            var conversation = Utility.FindConversation(DialogueManager.instance.initialDatabase.conversations, notification.conversationGuid);
+            var dialogueEntry = conversation != null ? Utility.FindDialogueEntry(conversation, notification.dialogueEntryGuid) : null;
+
+            // Get title and text
+            var title = conversation?.Title;
+            var text = dialogueEntry?.DialogueText;
 
             // Create tooltip
-            string tooltip = "";
+            string tooltip = string.Format("<color=white>Conversation:</color> <color=#ffc108>{0}</color>\n<color=white>Dialogue Entry:</color> <color=#00bdd3>{1}</color>", title, text);
 
             tooltip = tooltip.Length == 0 ? "No method" : tooltip.TrimEnd();
             return new MarkerDrawOptions { tooltip = tooltip };

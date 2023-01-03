@@ -13,11 +13,10 @@ namespace DialogueSystemTools
             var message = notification as DialogueEventNotification;
             if (message == null) return;
 
-            var conversant = message.conversant;
             var conversation = message.conversation;
             var dialogueEntry = message.dialogueEntry;
 
-            DialogueManager.StartConversation(conversation.Title, transform, conversant, dialogueEntry.id);
+            DialogueManager.StartConversation(conversation.Title, transform, null, dialogueEntry.id);
         }
     }
 }
