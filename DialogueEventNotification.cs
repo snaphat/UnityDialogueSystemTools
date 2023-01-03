@@ -14,16 +14,19 @@ namespace DialogueSystemTools
 {
 
     [CustomStyle("DialogueMarkerStyle")]
-    [Serializable, DisplayName("Dialogue Marker")]
+    [Serializable, DisplayName("Dialogue Event Marker")]
     public class DialogueEventNotification : Marker, INotification
     {
+        public bool pauseTimeline = true;
         public string conversationGuid = "";
         public string dialogueEntryGuid = "";
 
-        public Conversation conversation;
-        public DialogueEntry dialogueEntry;
+        [NonSerialized]
+        public Conversation conversation = null;
+        [NonSerialized]
+        public DialogueEntry dialogueEntry = null;
 
-        public void OnEnable()
+        public void Awake()
         {
             if (Application.isPlaying)
             {
@@ -41,6 +44,7 @@ namespace DialogueSystemTools
     public class DialogueEventNotificationEditor : Editor
     {
         SerializedProperty m_Time;
+        SerializedProperty m_pauseTimeline;
         SerializedProperty m_conversationGuid;
         SerializedProperty m_dialogueEntryGuid;
         Marker marker;
@@ -50,6 +54,7 @@ namespace DialogueSystemTools
         {
             // Functional properties
             m_Time = serializedObject.FindProperty("m_Time");
+            m_pauseTimeline = serializedObject.FindProperty("pauseTimeline");
             m_conversationGuid = serializedObject.FindProperty("conversationGuid");
             m_dialogueEntryGuid = serializedObject.FindProperty("dialogueEntryGuid");
         }
@@ -66,15 +71,22 @@ namespace DialogueSystemTools
             if (newMarker != marker && newMarker && newMarker.parent is not DialogueEventTrack)
                 Debug.LogWarning("<color=red>DialogueSystemTools: Add Dialogue Event Marker to a Dialogue Event Track</color>");
 
+            // Set marker
             marker = newMarker;
 
             using var changeScope = new EditorGUI.ChangeCheckScope();
+
+            // draw time selector
             EditorGUILayout.PropertyField(m_Time);
             EditorGUILayout.Space();
+
+            // Draw pause selector
+            EditorGUILayout.PropertyField(m_pauseTimeline);
 
             // apply changes
             if (changeScope.changed) serializedObject.ApplyModifiedProperties();
 
+            // Draw conversation and dialogue selectors
             Utility.ConversationSelectorGUI(serializedObject, m_conversationGuid, m_dialogueEntryGuid);
         }
     }
