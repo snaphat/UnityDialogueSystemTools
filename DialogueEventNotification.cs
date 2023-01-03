@@ -15,7 +15,7 @@ namespace DialogueSystemTools
 
     [CustomStyle("DialogueMarkerStyle")]
     [Serializable, DisplayName("Dialogue Event Marker")]
-    public class DialogueEventNotification : Marker, INotification
+    public class DialogueEventNotification : Marker, INotification, INotificationOptionProvider
     {
         public bool pauseTimeline = true;
         public string conversationGuid = "";
@@ -36,6 +36,9 @@ namespace DialogueSystemTools
         }
 
         PropertyName INotification.id { get { return new PropertyName(); } }
+
+        // Retroactive = false, TriggerOnce = false, TriggerInEditMode = false 
+        NotificationFlags INotificationOptionProvider.flags { get { return 0; } }
     }
 
 #if UNITY_EDITOR
