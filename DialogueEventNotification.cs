@@ -41,7 +41,6 @@ namespace DialogueSystemTools
     public class DialogueEventNotificationEditor : Editor
     {
         SerializedProperty m_Time;
-        SerializedProperty m_conversant;
         SerializedProperty m_conversationGuid;
         SerializedProperty m_dialogueEntryGuid;
         Marker marker;
@@ -72,9 +71,6 @@ namespace DialogueSystemTools
             using var changeScope = new EditorGUI.ChangeCheckScope();
             EditorGUILayout.PropertyField(m_Time);
             EditorGUILayout.Space();
-
-            //
-            EditorGUILayout.PropertyField(m_conversant);
 
             // apply changes
             if (changeScope.changed) serializedObject.ApplyModifiedProperties();
