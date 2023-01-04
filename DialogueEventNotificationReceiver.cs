@@ -11,6 +11,8 @@ namespace DialogueSystemTools
         {
             IEnumerator StartConversation()
             {
+                yield return null; // One frame delay is needed before the conversation starts to avoid buggy dialogue fade-in
+
                 if (pauseTimeline)
                 {
                     var speed = playable.GetSpeed();
