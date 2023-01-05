@@ -7,35 +7,44 @@ namespace DialogueSystemTools
 {
     public class DialogueEventNotificationReceiver : MonoBehaviour, INotificationReceiver
     {
+        bool timelineStopped = false;
         public void StartConversation(Playable playable, string title, int entryID, bool pauseTimeline)
         {
+
+
             IEnumerator StartConversation()
             {
-                yield return null; // One frame delay is needed before the conversation starts to avoid buggy dialogue fade-in
+                // One frame delay is needed before the conversation starts to avoid buggy dialogue fade-in 
+                yield return null;
 
-                if (pauseTimeline)
+                IEnumerator Pause()
                 {
-                    var speed = playable.GetSpeed();
-                    while (DialogueManager.Instance.IsConversationActive)
+                    if (pauseTimeline)
                     {
-                        playable.SetSpeed(0);
-                        yield return null;
+                        var coroutinePausedTimeline = false; // whether this coroutine paused the timeline
+                        var speed = playable.GetSpeed(); // cache speed
+                        while (DialogueManager.IsConversationActive)
+                        {
+                            if (!timelineStopped)
+                            {
+                                coroutinePausedTimeline = timelineStopped = true;
+                                playable.SetSpeed(0);
+                            }
+                            yield return null;
+                        }
+                        if (coroutinePausedTimeline) // if this couroutine paused the timeline restore the speed
+                        {
+                            timelineStopped = false; // mark the timeline as no longer stopped
+                            playable.SetSpeed(speed);
+                        }
                     }
-                    playable.SetSpeed(speed);
                 }
 
-                DialogueManager.StartConversation(title, transform, null, entryID);
+                yield return Pause(); // Pause if pausing enabled
 
-                if (pauseTimeline)
-                {
-                    var speed = playable.GetSpeed();
-                    while (DialogueManager.Instance.IsConversationActive)
-                    {
-                        playable.SetSpeed(0);
-                        yield return null;
-                    }
-                    playable.SetSpeed(speed);
-                }
+                DialogueManager.StartConversation(title, transform, null, entryID); // Start conversation
+
+                yield return Pause(); // Pause if pausing enabled
 
                 yield break;
             }
