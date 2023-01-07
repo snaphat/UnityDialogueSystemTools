@@ -53,6 +53,14 @@ namespace DialogueSystemTools
         public ListenerMethod listener; // listener method
         public string tagMatch = "";    // Tag Match check
 
+        // Check logic for each listener and tag combination
+        public void CheckMatch(ListenerMethod listener, Transform actor)
+        {
+            if (this.listener == listener)
+                if (tagMatch == "" || tagMatch == actor.tag)
+                    StartConversation(actor);
+        }
+
         public void Awake()
         {
             AddListener();
@@ -109,182 +117,35 @@ namespace DialogueSystemTools
             }
         }
 
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnUse(Transform actor)
-        {
-            if (listener == ListenerMethod.OnUse)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
-        }
+        // Message Listeners for Dialogue System for Unity (PixelCrushers)
+        public void OnUse(Transform actor) { CheckMatch(ListenerMethod.OnUse, actor); }
+        public void OnBarkStart(Transform actor) { CheckMatch(ListenerMethod.OnBarkStart, actor); }
+        public void OnBarkEnd(Transform actor) { CheckMatch(ListenerMethod.OnBarkEnd, actor); }
+        public void OnConversationStart(Transform actor) { CheckMatch(ListenerMethod.OnConversationStart, actor); }
+        public void OnConversationEnd(Transform actor) { CheckMatch(ListenerMethod.OnConversationEnd, actor); }
+        public void OnSequenceStart(Transform actor) { CheckMatch(ListenerMethod.OnSequenceStart, actor); }
+        public void OnSequenceEnd(Transform actor) { CheckMatch(ListenerMethod.OnSequenceEnd, actor); }
 
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnBarkStart(Transform actor)
-        {
-            if (listener == ListenerMethod.OnBarkStart)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
-        }
+        // Message Listeners for Unity Collider
+        public void OnTriggerStay(Collider other) { CheckMatch(ListenerMethod.OnTriggerStay, other.transform); }
+        public void OnTriggerEnter(Collider other) { CheckMatch(ListenerMethod.OnTriggerEnter, other.transform); }
+        public void OnTriggerExit(Collider other) { CheckMatch(ListenerMethod.OnTriggerExit, other.transform); }
+        public void OnCollisionStay(Collision collision) { CheckMatch(ListenerMethod.OnCollisionStay, collision.transform); }
+        public void OnCollisionEnter(Collision collision) { CheckMatch(ListenerMethod.OnCollisionEnter, collision.transform); }
+        public void OnCollisionExit(Collision collision) { CheckMatch(ListenerMethod.OnCollisionExit, collision.transform); }
 
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnBarkEnd(Transform actor)
-        {
-            if (listener == ListenerMethod.OnBarkEnd)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
+        // Message Listeners for Unity Collider2D
+        public void OnTriggerStay2D(Collider2D other) { CheckMatch(ListenerMethod.OnTriggerStay2D, other.transform); }
+        public void OnTriggerEnter2D(Collider2D other) { CheckMatch(ListenerMethod.OnTriggerEnter2D, other.transform); }
+        public void OnTriggerExit2D(Collider2D other) { CheckMatch(ListenerMethod.OnTriggerExit2D, other.transform); }
+        public void OnCollisionStay2D(Collision2D collision) { CheckMatch(ListenerMethod.OnCollisionStay2D, collision.transform); }
+        public void OnCollisionEnter2D(Collision2D collision) { CheckMatch(ListenerMethod.OnCollisionEnter2D, collision.transform); }
+        public void OnCollisionExit2D(Collision2D collision) { CheckMatch(ListenerMethod.OnCollisionExit2D, collision.transform); }
 
-        }
-
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnConversationStart(Transform actor)
-        {
-            if (listener == ListenerMethod.OnConversationStart)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
-        }
-
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnConversationEnd(Transform actor)
-        {
-            if (listener == ListenerMethod.OnConversationEnd)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
-        }
-
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnSequenceStart(Transform actor)
-        {
-            if (listener == ListenerMethod.OnSequenceStart)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
-        }
-
-        // Message Listener for Dialogue System for Unity (PixelCrushers)
-        public void OnSequenceEnd(Transform actor)
-        {
-            if (listener == ListenerMethod.OnSequenceEnd)
-                if (tagMatch == "" || actor.tag == tagMatch)
-                    StartConversation(actor);
-        }
-
-        // Message Listener for Unity Collider
-        public void OnTriggerStay(Collider other)
-        {
-            if (listener == ListenerMethod.OnTriggerStay)
-                if (tagMatch == "" || other.tag == tagMatch)
-                    StartConversation(other.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider
-        public void OnTriggerEnter(Collider other)
-        {
-            if (listener == ListenerMethod.OnTriggerEnter)
-                if (tagMatch == "" || other.tag == tagMatch)
-                    StartConversation(other.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider
-        public void OnTriggerExit(Collider other)
-        {
-            if (listener == ListenerMethod.OnTriggerExit)
-                if (tagMatch == "" || other.tag == tagMatch)
-                    StartConversation(other.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider
-        public void OnCollisionStay(Collision collision)
-        {
-            if (listener == ListenerMethod.OnCollisionStay)
-                if (tagMatch == "" || collision.gameObject.tag == tagMatch)
-                    StartConversation(collision.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider
-        public void OnCollisionEnter(Collision collision)
-        {
-            if (listener == ListenerMethod.OnCollisionEnter)
-                if (tagMatch == "" || collision.gameObject.tag == tagMatch)
-                    StartConversation(collision.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider
-        public void OnCollisionExit(Collision collision)
-        {
-            if (listener == ListenerMethod.OnCollisionExit)
-                if (tagMatch == "" || collision.gameObject.tag == tagMatch)
-                    StartConversation(collision.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider2D
-        public void OnTriggerStay2D(Collider2D other)
-        {
-            if (listener == ListenerMethod.OnTriggerStay2D)
-                if (tagMatch == "" || other.tag == tagMatch)
-                    StartConversation(other.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider2D
-        public void OnTriggerEnter2D(Collider2D other)
-        {
-            if (listener == ListenerMethod.OnTriggerEnter2D)
-                if (tagMatch == "" || other.tag == tagMatch)
-                    StartConversation(other.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider2D
-        public void OnTriggerExit2D(Collider2D other)
-        {
-            if (listener == ListenerMethod.OnTriggerExit2D)
-                if (tagMatch == "" || other.tag == tagMatch)
-                    StartConversation(other.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider2D
-        public void OnCollisionStay2D(Collision2D collision)
-        {
-            if (listener == ListenerMethod.OnCollisionStay2D)
-                if (tagMatch == "" || collision.gameObject.tag == tagMatch)
-                    StartConversation(collision.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider2D
-        public void OnCollisionEnter2D(Collision2D collision)
-        {
-            if (listener == ListenerMethod.OnCollisionEnter2D)
-                if (tagMatch == "" || collision.gameObject.tag == tagMatch)
-                    StartConversation(collision.gameObject.transform);
-        }
-
-        // Message Listener for Unity Collider2D
-        public void OnCollisionExit2D(Collision2D collision)
-        {
-            if (listener == ListenerMethod.OnCollisionExit2D)
-                if (tagMatch == "" || collision.gameObject.tag == tagMatch)
-                    StartConversation(collision.gameObject.transform);
-        }
-
-        // Event Listener for Unity PlayableDirector
-        public void OnPlayed(PlayableDirector director)
-        {
-            if (listener == ListenerMethod.OnPlayed)
-                if (tagMatch == "" || director.tag == tagMatch)
-                    StartConversation(director.transform);
-        }
-
-        // Event Listener for Unity PlayableDirector
-        public void OnPaused(PlayableDirector director)
-        {
-            if (listener == ListenerMethod.OnPaused)
-                if (tagMatch == "" || director.tag == tagMatch)
-                    StartConversation(director.transform);
-        }
-
-        // Event Listener for Unity PlayableDirector
-        public void OnStopped(PlayableDirector director)
-        {
-            if (listener == ListenerMethod.OnStopped)
-                if (tagMatch == "" || director.tag == tagMatch)
-                    StartConversation(director.transform);
-        }
+        // Event Listeners for Unity PlayableDirector
+        public void OnPlayed(PlayableDirector director) { CheckMatch(ListenerMethod.OnPlayed, director.transform); }
+        public void OnPaused(PlayableDirector director) { CheckMatch(ListenerMethod.OnPaused, director.transform); }
+        public void OnStopped(PlayableDirector director) { CheckMatch(ListenerMethod.OnStopped, director.transform); }
 
         // Callback for starting a conversation
         public void StartConversation(Transform actor)
