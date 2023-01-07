@@ -11,6 +11,12 @@ namespace DialogueSystemTools
 {
     public enum ListenerMethod
     {
+        // Listeners for Monobehaviours 
+        Awake,
+        Start,
+        OnEnable,
+        OnDisable,
+
         // Listeners for Dialogue System for Unity (PixelCrushers) Messages
         OnUse,
         OnBarkStart,
@@ -57,36 +63,8 @@ namespace DialogueSystemTools
         public void CheckMatch(ListenerMethod listener, Transform actor)
         {
             if (this.listener == listener)
-                if (tagMatch == "" || tagMatch == actor.tag)
+                if (tagMatch == "" || (actor != null && tagMatch == actor.tag))
                     StartConversation(actor);
-        }
-
-        public void Awake()
-        {
-            AddListener();
-
-            conversation = Utility.FindConversation(DialogueManager.instance.initialDatabase.conversations, conversationGuid);
-            dialogueEntry = Utility.FindDialogueEntry(conversation, dialogueEntryGuid);
-
-            // PlayOnAwake/Play workaround bc played events are trigger before we registered ours if it woke up before
-            // us
-            if (listener == ListenerMethod.OnPlayed)
-            {
-                // if the playablegraph is playing and it just started then we need to invoke our callbacks
-                var director = GetComponent<PlayableDirector>();
-                if (director != null && director.playableGraph.IsValid() && director.playableGraph.IsPlaying()
-                    && director.time == director.initialTime)
-                {
-                    // Wait one frame to make sure all scene objects are initialized before invoking callbacks 
-                    IEnumerator DelayInvokeCallbacks()
-                    {
-                        yield return null;
-                        OnPlayed(director); // Manually call OnPlayed callback
-                        yield break;
-                    };
-                    StartCoroutine(DelayInvokeCallbacks());
-                }
-            }
         }
 
         // Add Event listener for PlayableDirector Events
@@ -116,6 +94,39 @@ namespace DialogueSystemTools
                 director.stopped -= OnStopped;
             }
         }
+
+        // Message Listeners for Monobehaviours
+        public void Awake()
+        {
+            AddListener();
+
+            conversation = Utility.FindConversation(DialogueManager.instance.initialDatabase.conversations, conversationGuid);
+            dialogueEntry = Utility.FindDialogueEntry(conversation, dialogueEntryGuid);
+
+            // PlayOnAwake/Play workaround bc played events are trigger before we registered ours if it woke up before us
+            if (listener == ListenerMethod.OnPlayed)
+            {
+                // if the playablegraph is playing and it just started then we need to invoke our callbacks
+                var director = GetComponent<PlayableDirector>();
+                if (director != null && director.playableGraph.IsValid() && director.playableGraph.IsPlaying()
+                    && director.time == director.initialTime)
+                {
+                    // Wait one frame to make sure all scene objects are initialized before invoking callbacks 
+                    IEnumerator DelayInvokeCallbacks()
+                    {
+                        yield return null;
+                        OnPlayed(director); // Manually call OnPlayed callback
+                        yield break;
+                    };
+                    StartCoroutine(DelayInvokeCallbacks());
+                }
+            }
+
+            CheckMatch(ListenerMethod.Awake, null);
+        }
+        public void Start() { CheckMatch(ListenerMethod.Start, null); }
+        public void OnEnable() { CheckMatch(ListenerMethod.OnEnable, null); }
+        public void OnDisable() { CheckMatch(ListenerMethod.OnDisable, null); }
 
         // Message Listeners for Dialogue System for Unity (PixelCrushers)
         public void OnUse(Transform actor) { CheckMatch(ListenerMethod.OnUse, actor); }
