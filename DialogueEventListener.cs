@@ -2,6 +2,7 @@ using System.Collections;
 using PixelCrushers.DialogueSystem;
 using UnityEngine;
 using UnityEngine.Playables;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -59,12 +60,29 @@ namespace DialogueSystemTools
         public ListenerMethod listener; // listener method
         public string tagMatch = "";    // Tag Match check
 
+        [Serializable]
+        public class QuestCondition
+        {
+            [QuestPopup]
+            public string name;
+
+            [QuestState]
+            public QuestState state;
+        };
+
+        public QuestCondition[] questConditions;
+
         // Check logic for each listener and tag combination
         public void CheckMatch(ListenerMethod listener, Transform actor)
         {
             if (this.listener == listener)
                 if (tagMatch == "" || (actor != null && tagMatch == actor.tag))
+                {
+                    foreach (var quest in questConditions)
+                        if (QuestLog.GetQuestState(quest.name) != quest.state)
+                            return;
                     StartConversation(actor);
+                }
         }
 
         // Add Event listener for PlayableDirector Events
@@ -172,8 +190,9 @@ namespace DialogueSystemTools
     {
         SerializedProperty m_Listener;
         SerializedProperty m_TagMatch;
-        SerializedProperty m_conversationGuid;
-        SerializedProperty m_dialogueEntryGuid;
+        SerializedProperty m_QuestConditions;
+        SerializedProperty m_ConversationGuid;
+        SerializedProperty m_DialogueEntryGuid;
 
         // Get serialized object properties (for UI)
         public void OnEnable()
@@ -181,8 +200,9 @@ namespace DialogueSystemTools
             // Functional properties
             m_Listener = serializedObject.FindProperty("listener");
             m_TagMatch = serializedObject.FindProperty("tagMatch");
-            m_conversationGuid = serializedObject.FindProperty("conversationGuid");
-            m_dialogueEntryGuid = serializedObject.FindProperty("dialogueEntryGuid");
+            m_QuestConditions = serializedObject.FindProperty("questConditions");
+            m_ConversationGuid = serializedObject.FindProperty("conversationGuid");
+            m_DialogueEntryGuid = serializedObject.FindProperty("dialogueEntryGuid");
         }
 
         // Draw inspector GUI
@@ -194,17 +214,18 @@ namespace DialogueSystemTools
 
                 // Draw listener field
                 EditorGUILayout.PropertyField(m_Listener);
+                EditorGUILayout.PropertyField(m_QuestConditions);
 
                 // Draw tag selector field
                 if (m_TagMatch.stringValue == "") m_TagMatch.stringValue = "Untagged";
-                m_TagMatch.stringValue = EditorGUILayout.TagField("Tag", m_TagMatch.stringValue);
+                m_TagMatch.stringValue = EditorGUILayout.TagField("Tag Condition", m_TagMatch.stringValue);
                 if (m_TagMatch.stringValue == "Untagged") m_TagMatch.stringValue = "";
 
                 // apply changes
                 if (changeScope.changed) serializedObject.ApplyModifiedProperties();
             }
 
-            Utility.ConversationSelectorGUI(serializedObject, m_conversationGuid, m_dialogueEntryGuid);
+            Utility.ConversationSelectorGUI(serializedObject, m_ConversationGuid, m_DialogueEntryGuid);
         }
     }
 #endif
